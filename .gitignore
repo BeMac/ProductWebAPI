@@ -1,3 +1,7 @@
+.idea/
+.vs/
+**/bin/
+**/obj/
 bin/
 obj/
 /packages/
