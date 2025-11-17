@@ -1,6 +1,10 @@
 ﻿namespace ProductWebApi.Service;
 
-public class ProductService
+interface IProductService
+{
+}
+
+public class ProductService : IProductService
 {
 
 }

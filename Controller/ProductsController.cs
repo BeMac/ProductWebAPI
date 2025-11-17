@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProductWebApi.Data;
 using ProductWebApi.Models;
+using ProductWebApi.Repositories;
 
 namespace ProductWebApi.Controller
 {
@@ -9,10 +11,12 @@ namespace ProductWebApi.Controller
     public class ProductsController : ControllerBase
     {
         private readonly ProductContext _context;
-
-        public ProductsController(ProductContext context)
+        private readonly IProductRepository _repository;
+        
+        public ProductsController(ProductContext context, ProductRepository productRepository)
         {
             _context = context;
+            _repository = productRepository;
         }
 
         // GET: api/Products
@@ -26,7 +30,7 @@ namespace ProductWebApi.Controller
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _repository.GetProductAsync(id);
 
             if (product == null)
             {
@@ -98,6 +102,43 @@ namespace ProductWebApi.Controller
         private bool ProductExists(int id)
         {
             return _context.Products.Any(e => e.Id == id);
+        }
+        
+        // GET /api/products/search?searchTerm=&categoryId=&minPrice=&maxPrice=&inStock=&sortBy=&sortOrder=&pageNumber=&pageSize=
+        [HttpGet("search")]
+        public async Task<ActionResult<PagedResult<Product>>> Search(
+            [FromQuery] string? searchTerm,
+            [FromQuery] long? categoryId,
+            [FromQuery] decimal? minPrice,
+            [FromQuery] decimal? maxPrice,
+            [FromQuery] bool? inStock,
+            [FromQuery] string? sortBy,
+            [FromQuery] string? sortOrder,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var result = await _repository.SearchAsync(
+                searchTerm,
+                categoryId,
+                minPrice,
+                maxPrice,
+                inStock,
+                sortBy,
+                sortOrder,
+                pageNumber,
+                pageSize);
+
+            // Shape the response exactly as requested
+            var response = new
+            {
+                items = result.Items,
+                totalCount = result.TotalCount,
+                pageNumber = result.PageNumber,
+                pageSize = result.PageSize,
+                totalPages = result.TotalPages
+            };
+
+            return Ok(response);
         }
     }
 }

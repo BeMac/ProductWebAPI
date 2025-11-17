@@ -6,3 +6,8 @@ We baked in Postgres into a Docker image. Postgres based on its speed, the conve
 A couple references I used to stand this portion up:
     https://mohamadlawand.medium.com/net-7-how-to-containerise-web-api-with-docker-use-postgresql-e3791293c4f0
     https://www.dbvis.com/thetable/how-to-set-up-postgres-using-docker/
+
+Database setup:
+I set up a foreign key relationship between Product and CategoryId
+I set up a index for this foreign key contraint
+Set up a second index for searching on Product Name
