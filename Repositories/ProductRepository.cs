@@ -4,7 +4,7 @@ using ProductWebApi.Models;
 
 namespace ProductWebApi.Repositories;
 
-interface IProductRepository
+public interface IProductRepository
 {
     Task<Product?> GetProductAsync(long id);
     Task<IEnumerable<Product>> GetAllAsync();
