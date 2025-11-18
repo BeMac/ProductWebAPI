@@ -1,23 +1,27 @@
 using Microsoft.EntityFrameworkCore;
 using ProductWebApi.Data;
 using ProductWebApi.Repositories;
-using ProductWebApi.Service;
+using ProductWebApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddOpenApi();
-//builder.Services.AddDbContext<ProductContext>(opt => opt.UseInMemoryDatabase("Product"));
+builder.Services.AddDbContext<ProductContext>(opt => opt.UseInMemoryDatabase("Product"));
+builder.Services.AddDbContext<CategoryContext>(opt => opt.UseInMemoryDatabase("Product")); // register CategoryContext
 
-var conn = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<ProductContext>(options =>
-    options.UseNpgsql(conn));
 
+//DI Repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
+//DI Services
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+//swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
@@ -28,6 +32,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
+app.UseSwagger();
 app.MapControllers();
 app.Run();
