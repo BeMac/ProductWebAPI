@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using ProductWebApi.Models;
 using ProductWebApi.Repositories;
 using ProductWebApi.Services;
@@ -18,14 +19,13 @@ namespace ProductWebApi.Controller
             _productService = productService;
         }
 
-        // GET: api/Products
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             return Ok(await _productRepository.GetAllAsync());
         }
 
-        // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
@@ -38,9 +38,7 @@ namespace ProductWebApi.Controller
 
             return product;
         }
-
-        // PUT: api/Products/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+                
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProduct(int id, [FromBody] ProductRequest request)
         {
@@ -56,8 +54,7 @@ namespace ProductWebApi.Controller
                 Price = request.Price,
                 StockQuantity = request.StockQuantity,
                 CategoryId = request.CategoryId,
-                IsActive = request.IsActive
-                // CreatedDate is not updated
+                IsActive = request.IsActive                
             };
 
             var updatedProduct = await _productRepository.UpdateAsync(id, product);
@@ -85,38 +82,7 @@ namespace ProductWebApi.Controller
 
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
-
-
-        // [HttpPost]
-        // public async Task<ActionResult<Product>> CreateProduct([FromBody] CreateProductRequest request)
-        // {
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return ValidationProblem(ModelState);
-        //     }
-        //
-        //     var product = new Product
-        //     {
-        //         Name = request.Name,
-        //         Description = request.Description,
-        //         Price = request.Price,
-        //         StockQuantity = request.StockQuantity,
-        //         CategoryId = request.CategoryId,
-        //         CreatedDate = DateTime.UtcNow,
-        //         IsActive = true
-        //     };
-        //
-        //     // Assuming your repository has an AddAsync/SaveAsync (adapt names as needed)
-        //     await _productRepository.AddAsync(product);
-        //
-        //     // If you need to return the created resource with route:
-        //     // return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
-        //
-        //     return Created(string.Empty, product);
-        // }
-
-
-        // DELETE: api/Products/5
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {

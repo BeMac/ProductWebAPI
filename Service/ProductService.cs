@@ -22,7 +22,7 @@ public class ProductService : IProductService
 
     public Product BuildProduct(ProductRequest request)
     {
-        Category? category = _categoryRepository.GetById(request.CategoryId);
+        Category? category = _categoryRepository.GetCategory(request.CategoryId);
         if (category == null)
         {
             throw new ArgumentException("Invalid CategoryId");
