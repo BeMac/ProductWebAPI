@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ProductWebApi.Data;
 using ProductWebApi.Models;
 using ProductWebApi.Repositories;
+using ProductWebApi.Services;
 
 namespace ProductWebApi.Controller
 {
@@ -10,27 +9,27 @@ namespace ProductWebApi.Controller
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly ProductContext _context;
-        private readonly IProductRepository _repository;
-        
-        public ProductsController(ProductContext context, ProductRepository productRepository)
+        private readonly IProductRepository _productRepository;
+        private readonly IProductService _productService;
+
+        public ProductsController(IProductRepository productProductRepository, IProductService productService)
         {
-            _context = context;
-            _repository = productRepository;
+            _productRepository = productProductRepository;
+            _productService = productService;
         }
 
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Products.ToListAsync();
+            return Ok(await _productRepository.GetAllAsync());
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _repository.GetProductAsync(id);
+            var product = await _productRepository.GetProductAsync(id);
 
             if (product == null)
             {
@@ -43,65 +42,98 @@ namespace ProductWebApi.Controller
         // PUT: api/Products/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
+        public async Task<IActionResult> PutProduct(int id, [FromBody] ProductRequest request)
         {
-            if (id != product.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return ValidationProblem(ModelState);
             }
-
-            _context.Entry(product).State = EntityState.Modified;
-
-            try
+            var product = new Product
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
+                Id = id,
+                Name = request.Name,
+                Description = request.Description,
+                Price = request.Price,
+                StockQuantity = request.StockQuantity,
+                CategoryId = request.CategoryId,
+                IsActive = request.IsActive
+                // CreatedDate is not updated
+            };
+
+            var updatedProduct = await _productRepository.UpdateAsync(id, product);
+
+            if (updatedProduct == null)
             {
-                if (!ProductExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound();
             }
 
             return NoContent();
-        }
-
-        // POST: api/Products
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
-        {
-            _context.Products.Add(product);
-            await _context.SaveChangesAsync();
-
             
+        }
+        
+        [HttpPost]
+        public async Task<ActionResult<Product>> PostProduct([FromBody] ProductRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+
+            var product = _productService.BuildProduct(request);
+            
+            await _productRepository.AddAsync(product);
+
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
         }
+
+
+        // [HttpPost]
+        // public async Task<ActionResult<Product>> CreateProduct([FromBody] CreateProductRequest request)
+        // {
+        //     if (!ModelState.IsValid)
+        //     {
+        //         return ValidationProblem(ModelState);
+        //     }
+        //
+        //     var product = new Product
+        //     {
+        //         Name = request.Name,
+        //         Description = request.Description,
+        //         Price = request.Price,
+        //         StockQuantity = request.StockQuantity,
+        //         CategoryId = request.CategoryId,
+        //         CreatedDate = DateTime.UtcNow,
+        //         IsActive = true
+        //     };
+        //
+        //     // Assuming your repository has an AddAsync/SaveAsync (adapt names as needed)
+        //     await _productRepository.AddAsync(product);
+        //
+        //     // If you need to return the created resource with route:
+        //     // return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, product);
+        //
+        //     return Created(string.Empty, product);
+        // }
+
 
         // DELETE: api/Products/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _productRepository.GetProductAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            _context.Products.Remove(product);
-            await _context.SaveChangesAsync();
+            await _productRepository.DeleteAsync(product);
 
             return NoContent();
         }
 
         private bool ProductExists(int id)
         {
-            return _context.Products.Any(e => e.Id == id);
+            return _productRepository.ProductExists(id);
         }
         
         // GET /api/products/search?searchTerm=&categoryId=&minPrice=&maxPrice=&inStock=&sortBy=&sortOrder=&pageNumber=&pageSize=
@@ -117,7 +149,7 @@ namespace ProductWebApi.Controller
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10)
         {
-            var result = await _repository.SearchAsync(
+            var result = await _productRepository.SearchAsync(
                 searchTerm,
                 categoryId,
                 minPrice,

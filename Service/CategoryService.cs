@@ -1,4 +1,4 @@
-﻿namespace ProductWebApi.Service;
+﻿namespace ProductWebApi.Services;
 
 interface ICategoryService
 {

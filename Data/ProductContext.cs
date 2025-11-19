@@ -7,6 +7,7 @@ namespace ProductWebApi.Data
     {
         public ProductContext(DbContextOptions<ProductContext> options) : base(options)
         {
+            Database.EnsureCreated();
         }
 
         public DbSet<Product> Products => Set<Product>();
@@ -18,9 +19,9 @@ namespace ProductWebApi.Data
 
             // Product -> Category (many-to-one)
             modelBuilder.Entity<Product>()
-                .HasOne(p => p.Category)
-                .WithMany(c => c.Products)
-                .HasForeignKey(p => p.Id)
+                .HasOne<Category>()
+                .WithMany()
+                .HasForeignKey(p => p.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
             
             // for CategoryId foreign key constraint

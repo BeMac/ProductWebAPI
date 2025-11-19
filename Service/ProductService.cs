@@ -5,7 +5,8 @@ namespace ProductWebApi.Services;
 
 public interface IProductService
 {
-    Product BuildProduct(CreateProductRequest request);
+    Product BuildProduct(ProductRequest request);
+    
 }
 
 public class ProductService : IProductService
@@ -20,7 +21,7 @@ public class ProductService : IProductService
     }
 
 
-    public Product BuildProduct(CreateProductRequest request)
+    public Product BuildProduct(ProductRequest request)
     {
         Category? category = _categoryRepository.GetById(request.CategoryId);
         if (category == null)
@@ -29,15 +30,14 @@ public class ProductService : IProductService
         }
 
         var product = new Product
-        {
-            Id = request.CategoryId,
+        {            
+            Id = request.Id,
             Name = request.Name,
             Description = request.Description,
             Price = request.Price,
             StockQuantity = request.StockQuantity,
             CategoryId = category.Id,
-            CreatedDate = DateTime.UtcNow,
-            Category = category,
+            CreatedDate = DateTime.UtcNow,            
             IsActive = true
         };
 

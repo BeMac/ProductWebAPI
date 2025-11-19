@@ -3,16 +3,26 @@
 GET {{ProductWebApi_HostAddress}}/weatherforecast/
 Accept: application/json
 
+
+###
+POST {{ProductWebApi_HostAddress}}/api/category
+Content-Type: application/json
+{
+  "Id": 1,
+  "Name": "CLothes",
+  "Description": "Things to keep you warm",
+  "IsActive": true    
+}
 ###
 
 POST {{ProductWebApi_HostAddress}}/api/products
 Content-Type: application/json
 
 {
-  "Id": 2,
-  "Name": "Tent",
-  "Description": "A tent to sleep in",
-  "Price": 149.99,
+  
+  "Name": "Shirt",
+  "Description": "A shirt, with a cool dog on it",
+  "Price": 14.99,
   "CategoryId": 1,
   "StockQuantity": 25,
   "CreatedDate": "2024-06-01T10:00:00Z",
@@ -21,6 +31,11 @@ Content-Type: application/json
 
 ###
 
-GET {{ProductWebApi_HostAddress}}/api/products
+@id=1
+GET {{ProductWebApi_HostAddress}}/api/category/{{id}}
 
 ###
+
+GET {{ProductWebApi_HostAddress}}/api/products
+
+

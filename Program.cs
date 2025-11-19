@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using ProductWebApi.Data;
 using ProductWebApi.Repositories;
 using ProductWebApi.Services;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
 builder.Services.AddOpenApi();
 builder.Services.AddDbContext<ProductContext>(opt => opt.UseInMemoryDatabase("Product"));
 builder.Services.AddDbContext<CategoryContext>(opt => opt.UseInMemoryDatabase("Product")); // register CategoryContext

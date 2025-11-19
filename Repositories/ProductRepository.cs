@@ -8,6 +8,10 @@ public interface IProductRepository
 {
     Task<Product?> GetProductAsync(long id);
     Task<IEnumerable<Product>> GetAllAsync();
+    Task AddAsync(Product product);
+    Task<Product?> UpdateAsync(int id, Product product);
+    Task DeleteAsync(Product product);
+    bool ProductExists(int id);
     Task<PagedResult<Product>> SearchAsync(
         string? searchTerm,
         long? categoryId,
@@ -42,8 +46,68 @@ public class ProductRepository : IProductRepository
             .AsNoTracking()
             .ToListAsync();
     }
+
+    public async Task AddAsync(Product product)
+    {
+        _context.Products.Add(product);        
+        await _context.SaveChangesAsync();
+    }
     
-        public async Task<PagedResult<Product>> SearchAsync(
+    public async Task<Product?> UpdateAsync(int id, Product product)
+    {
+        if (id != product.Id)
+        {
+            return null;
+        }
+
+        var existingProduct = await _context.Products.FindAsync(id);
+        if (existingProduct == null)
+        {
+            return null;
+        }
+
+        // Update properties
+        existingProduct.Name = product.Name;
+        existingProduct.Description = product.Description;
+        existingProduct.Price = product.Price;
+        existingProduct.StockQuantity = product.StockQuantity;
+        existingProduct.CategoryId = product.CategoryId;
+        existingProduct.IsActive = product.IsActive;
+        // Don't update CreatedDate
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!await ProductExistsAsync(id))
+            {
+                return null;
+            }
+            throw;
+        }
+
+        return existingProduct;
+    }
+
+    private async Task<bool> ProductExistsAsync(int id)
+    {
+        return await _context.Products.AnyAsync(p => p.Id == id);
+    }
+    
+    public async Task DeleteAsync(Product product)
+    {
+        _context.Products.Remove(product);
+        await _context.SaveChangesAsync();
+    }
+    
+    public bool ProductExists(int id)
+    {
+        return _context.Products.Any(e => e.Id == id);
+    }
+    
+    public async Task<PagedResult<Product>> SearchAsync(
         string? searchTerm,
         long? categoryId,
         decimal? minPrice,
