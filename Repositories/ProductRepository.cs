@@ -6,7 +6,7 @@ namespace ProductWebApi.Repositories;
 
 public interface IProductRepository
 {
-    Task<Product?> GetProductAsync(long id);
+    Task<Product?> GetProductAsync(int id);
     Task<IEnumerable<Product>> GetAllAsync();
     Task AddAsync(Product product);
     Task<Product?> UpdateAsync(int id, Product product);
@@ -33,7 +33,7 @@ public class ProductRepository : IProductRepository
         _context = context;
     }
 
-    public async Task<Product?> GetProductAsync(long id)
+    public async Task<Product?> GetProductAsync(int id)
     {
         return await _context.Products
             .AsNoTracking()
