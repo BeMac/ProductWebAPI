@@ -1,14 +1,18 @@
-@ProductWebApi_HostAddress = https://localhost:7105
+@ProductWebApi_HostAddress = https://localhost:8080
 
 
 POST {{ProductWebApi_HostAddress}}/api/category
 Content-Type: application/json
+
 {
   "Id": 1,
   "Name": "CLothes",
   "Description": "Things to keep you warm",
   "IsActive": true    
 }
+
+###
+GET {{ProductWebApi_HostAddress}}/api/category
 
 ###
 POST {{ProductWebApi_HostAddress}}/api/products
@@ -38,24 +42,37 @@ Content-Type: application/json
   "CreatedDate": "2024-06-01T10:00:00Z",
   "IsActive": true
 }
-###
 
-@id=1
-GET {{ProductWebApi_HostAddress}}/api/category/{{id}}
+
 
 ###
 
 GET {{ProductWebApi_HostAddress}}/api/products
 
 ###
-@id=1
-DELETE {{ProductWebApi_HostAddress}}/api/products/{{id}}
+
+
+DELETE {{ProductWebApi_HostAddress}}/api/products/1
 
 ###
-@id=1
-GET {{ProductWebApi_HostAddress}}/api/products/{{id}}
 
+
+GET {{ProductWebApi_HostAddress}}/api/products
 
 ###
 @id=2
-GET {{ProductWebApi_HostAddress}}/api/products/{{id}}
+PUT {{ProductWebApi_HostAddress}}/api/products/{{id}}
+Content-Type: application/json
+
+{
+  "Id": 2,  
+  "Name": "Pants",
+  "Description": "Some blue selvedge denim jeans",
+  "Price": 20.00,
+  "CategoryId": 1,
+  "StockQuantity": 6,
+  "CreatedDate": "2024-06-01T10:00:00Z",
+  "IsActive": true
+}
+
+###
