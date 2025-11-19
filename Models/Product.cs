@@ -12,7 +12,6 @@ public class Product
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
     public DateTime CreatedDate { get; set; }
-    public bool IsActive { get; set; }
-    
+    public bool IsActive { get; set; }    
     public int CategoryId { get; set; }
 }

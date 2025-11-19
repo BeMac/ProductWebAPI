@@ -20,7 +20,6 @@ public class ProductService : IProductService
         _categoryRepository = categoryRepository;
     }
 
-
     public Product BuildProduct(ProductRequest request)
     {
         Category? category = _categoryRepository.GetById(request.CategoryId);
@@ -40,8 +39,6 @@ public class ProductService : IProductService
             CreatedDate = DateTime.UtcNow,            
             IsActive = true
         };
-
-
 
         return product;
     }    

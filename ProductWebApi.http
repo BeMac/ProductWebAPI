@@ -1,10 +1,6 @@
 @ProductWebApi_HostAddress = https://localhost:7105
 
-GET {{ProductWebApi_HostAddress}}/weatherforecast/
-Accept: application/json
 
-
-###
 POST {{ProductWebApi_HostAddress}}/api/category
 Content-Type: application/json
 {
@@ -13,13 +9,13 @@ Content-Type: application/json
   "Description": "Things to keep you warm",
   "IsActive": true    
 }
-###
 
+###
 POST {{ProductWebApi_HostAddress}}/api/products
 Content-Type: application/json
 
 {
-  
+  "Id": 1,
   "Name": "Shirt",
   "Description": "A shirt, with a cool dog on it",
   "Price": 14.99,
@@ -28,7 +24,20 @@ Content-Type: application/json
   "CreatedDate": "2024-06-01T10:00:00Z",
   "IsActive": true
 }
+###
+POST {{ProductWebApi_HostAddress}}/api/products
+Content-Type: application/json
 
+{
+  "Id": 2,  
+  "Name": "Pants",
+  "Description": "Some blue selvedge denim jeans",
+  "Price": 162.85,
+  "CategoryId": 1,
+  "StockQuantity": 300,
+  "CreatedDate": "2024-06-01T10:00:00Z",
+  "IsActive": true
+}
 ###
 
 @id=1
@@ -38,4 +47,15 @@ GET {{ProductWebApi_HostAddress}}/api/category/{{id}}
 
 GET {{ProductWebApi_HostAddress}}/api/products
 
+###
+@id=1
+DELETE {{ProductWebApi_HostAddress}}/api/products/{{id}}
 
+###
+@id=1
+GET {{ProductWebApi_HostAddress}}/api/products/{{id}}
+
+
+###
+@id=2
+GET {{ProductWebApi_HostAddress}}/api/products/{{id}}
