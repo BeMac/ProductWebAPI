@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using ProductWebApi.Data;
+﻿using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using ProductWebApi.Models;
 using ProductWebApi.Repositories;
 
@@ -10,52 +10,43 @@ namespace ProductWebApi.Controller
     [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly ProductContext _context;
-        private readonly IProductRepository _productRepository;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public CategoryController(ProductContext context, IProductRepository productProductRepository)
+        public CategoryController(ICategoryRepository categoryRepository)
         {
-            _context = context;
-            _productRepository = productProductRepository;
+            _categoryRepository = categoryRepository;
+        }
+        
+        [HttpGet]
+        public async Task<ActionResult<Category>> GetCategories()
+        {
+            return Ok(await _categoryRepository.GetAllAsync());
         }
 
-        // GET: api/Category/5
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null) return NotFound();
-            return category;
-        }
+            var category = await _categoryRepository.GetCategoryAsync(id);
 
-        // POST: api/Category/1
-        [HttpPost]
-        public async Task<ActionResult<Category>> PostCategory(Category category)
-        {
-            if (category == null)
-                return BadRequest();
-
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
-        }
-
-
-        // DELETE: api/Products/4
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(int id)
-        {
-            var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
                 return NotFound();
             }
 
-            _context.Categories.Remove(category);
-            await _context.SaveChangesAsync();
+            return category;
+        }
 
-            return NoContent();
+        [HttpPost]
+        public async Task<ActionResult<Category>> PostCategory(Category category)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ValidationProblem(ModelState);
+            }
+                
+            await _categoryRepository.AddAsync(category);            
+            return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
         }
     }
 }
