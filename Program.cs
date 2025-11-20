@@ -1,8 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using ProductWebApi.Data;
 using ProductWebApi.Repositories;
-using ProductWebApi.Services;
+using ProductWebApi.Service;
 using System.Text.Json.Serialization;
+using ProductWebApi.Service;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,17 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -34,6 +46,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAll");
 app.UseSwagger();
 app.MapControllers();
 app.Run();
